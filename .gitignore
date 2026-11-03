@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Xcode and Swift PM
+/.build
+/Packages
+xcuserdata/
+DerivedData/
+.swiftpm/
+*.xcodeproj
+*.xcworkspace
+
+# Built Application Bundles
+*.app
+*.app/
+*.dSYM/
+*.ipa
+
+# Temporary & Environment
+.env
+.env.*
+.netrc
+*~
+*.swp
