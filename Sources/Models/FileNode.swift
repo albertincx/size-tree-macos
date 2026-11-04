@@ -56,7 +56,7 @@ public final class FileNode: Identifiable, ObservableObject {
 
     public var formattedSize: String {
         guard let size = size else {
-            return isCalculating ? "Считается..." : "—"
+            return isCalculating ? LocalizationManager.shared.calculating : "—"
         }
         return ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
     }
@@ -64,6 +64,7 @@ public final class FileNode: Identifiable, ObservableObject {
     public var formattedModifiedDate: String {
         guard let date = modifiedDate else { return "—" }
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: LocalizationManager.shared.language.rawValue)
         formatter.dateStyle = .short
         formatter.timeStyle = .short
         return formatter.string(from: date)
@@ -72,6 +73,7 @@ public final class FileNode: Identifiable, ObservableObject {
     public var formattedCachedTime: String? {
         guard let cachedAt = cachedAt else { return nil }
         let formatter = RelativeDateTimeFormatter()
+        formatter.locale = Locale(identifier: LocalizationManager.shared.language.rawValue)
         formatter.unitsStyle = .short
         return formatter.localizedString(for: cachedAt, relativeTo: Date())
     }

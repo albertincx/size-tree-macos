@@ -193,11 +193,19 @@ public final class LocalizationManager: ObservableObject {
     }
 
     public func itemsCount(_ count: Int) -> String {
-        language == .russian ? "\(count) эл." : "\(count) items"
+        if language == .russian {
+            return "\(count) эл."
+        } else {
+            return count == 1 ? "1 item" : "\(count) items"
+        }
     }
 
     public func loadedObjects(_ count: Int) -> String {
-        language == .russian ? "Загружено объектов: \(count)" : "Loaded items: \(count)"
+        if language == .russian {
+            return "Загружено объектов: \(count)"
+        } else {
+            return count == 1 ? "Loaded 1 item" : "Loaded \(count) items"
+        }
     }
 
     public func loadingFolder(_ name: String) -> String {
@@ -205,11 +213,19 @@ public final class LocalizationManager: ObservableObject {
     }
 
     public func backgroundCalculation(_ count: Int) -> String {
-        language == .russian ? "Фоновый подсчёт (\(count) папок)..." : "Background calculation (\(count) folders)..."
+        if language == .russian {
+            return "Фоновый подсчёт (\(count) папок)..."
+        } else {
+            return count == 1 ? "Background calculation (1 folder)..." : "Background calculation (\(count) folders)..."
+        }
     }
 
     public func cacheStatsBottom(_ count: Int) -> String {
-        language == .russian ? "Кэш: \(count) папок" : "Cache: \(count) folders"
+        if language == .russian {
+            return "Кэш: \(count) папок"
+        } else {
+            return count == 1 ? "Cache: 1 folder" : "Cache: \(count) folders"
+        }
     }
 
     public var showInFinder: String {

@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import Foundation
 import SwiftUI
 
@@ -23,6 +24,24 @@ public enum SortOption: String, CaseIterable, Identifiable {
     }
 }
 
+public enum StatusState: Equatable {
+    case selectFolder
+    case loadingFolder(String)
+    case loadedObjects(Int)
+
+    @MainActor
+    public func message(using l10n: LocalizationManager) -> String {
+        switch self {
+        case .selectFolder:
+            return l10n.selectFolder
+        case .loadingFolder(let name):
+            return l10n.loadingFolder(name)
+        case .loadedObjects(let count):
+            return l10n.loadedObjects(count)
+        }
+    }
+}
+
 @MainActor
 public final class FolderTreeViewModel: ObservableObject {
     public var l10n = LocalizationManager.shared
@@ -34,7 +53,10 @@ public final class FolderTreeViewModel: ObservableObject {
     @Published public var searchQuery: String = ""
     @Published public var isScanningRoot: Bool = false
     @Published public var activeCalculationCount: Int = 0
-    @Published public var statusMessage: String = ""
+    @Published public var statusState: StatusState = .selectFolder
+    public var statusMessage: String {
+        statusState.message(using: l10n)
+    }
     @Published public var cachedItemsCount: Int = 0
     @Published public var showCacheSheet: Bool = false
     @Published public var showFiles: Bool = UserDefaults.standard.object(forKey: "FolderViewer.ShowFiles") as? Bool ?? true {
@@ -56,9 +78,16 @@ public final class FolderTreeViewModel: ObservableObject {
     private let cacheManager = SizeCacheManager.shared
     private let calculator = FolderSizeCalculator.shared
     private var calculationTasks: [String: Task<Void, Never>] = [:]
+    private var cancellables = Set<AnyCancellable>()
 
     public init() {
-        self.statusMessage = LocalizationManager.shared.selectFolder
+        self.statusState = .selectFolder
+
+        LocalizationManager.shared.$language
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
 
         if let saved = UserDefaults.standard.stringArray(forKey: recentPathsKey) {
             self.recentPaths = saved.compactMap { path in
@@ -87,7 +116,8 @@ public final class FolderTreeViewModel: ObservableObject {
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
         panel.canCreateDirectories = false
-        panel.prompt = "Выбрать папку"
+        panel.prompt = l10n.selectFolder
+        panel.message = l10n.selectFolderPrompt
 
         if panel.runModal() == .OK, let selectedURL = panel.url {
             loadFolder(url: selectedURL)
@@ -150,7 +180,7 @@ public final class FolderTreeViewModel: ObservableObject {
         calculationTasks.removeAll()
 
         self.currentRootURL = url
-        self.statusMessage = l10n.loadingFolder(url.lastPathComponent)
+        self.statusState = .loadingFolder(url.lastPathComponent)
         self.isScanningRoot = true
 
         Task { @MainActor in
@@ -158,7 +188,7 @@ public final class FolderTreeViewModel: ObservableObject {
             self.rootNodes = nodes
             self.isScanningRoot = false
             self.sortNodes()
-            self.statusMessage = l10n.loadedObjects(nodes.count)
+            self.statusState = .loadedObjects(nodes.count)
             await refreshCacheStats()
 
             // Trigger background calculation for non-cached directories

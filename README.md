@@ -4,6 +4,10 @@
 
 A fast, lightweight, and modern **SwiftUI** app for macOS designed to inspect folder and file trees, calculate disk sizes, and cache them for instant access with on-demand recalculation.
 
+<p align="center">
+  <img src="assets/screenshot.jpg" alt="FolderViewer Screenshot" width="800">
+</p>
+
 ---
 
 ## ✨ Features

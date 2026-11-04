@@ -4,6 +4,7 @@ public struct FileRowView: View {
     @ObservedObject var node: FileNode
     let level: Int
     @ObservedObject var viewModel: FolderTreeViewModel
+    @ObservedObject private var l10n = LocalizationManager.shared
 
     @State private var isHovered: Bool = false
 
@@ -54,7 +55,7 @@ public struct FileRowView: View {
                             ProgressView()
                                 .controlSize(.small)
                                 .scaleEffect(0.7)
-                            Text(viewModel.l10n.calculating)
+                            Text(l10n.calculating)
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
                         }
@@ -68,11 +69,11 @@ public struct FileRowView: View {
                                 .font(.system(size: 10))
                                 .foregroundColor(.green)
                             if let cachedTime = node.formattedCachedTime {
-                                Text(viewModel.l10n.cachedTimeAgo(cachedTime))
+                                Text(l10n.cachedTimeAgo(cachedTime))
                                     .font(.system(size: 11))
                                     .foregroundColor(.secondary)
                             } else {
-                                Text(viewModel.l10n.cachedBadge)
+                                Text(l10n.cachedBadge)
                                     .font(.system(size: 11))
                                     .foregroundColor(.secondary)
                             }
@@ -81,13 +82,13 @@ public struct FileRowView: View {
                         .padding(.vertical, 2)
                         .background(Color.green.opacity(0.12))
                         .cornerRadius(4)
-                        .help(viewModel.l10n.cacheHelp)
+                        .help(l10n.cacheHelp)
                     }
                 }
 
                 // Item count for directories
                 if node.isDirectory, let count = node.itemCount {
-                    Text(viewModel.l10n.itemsCount(count))
+                    Text(l10n.itemsCount(count))
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                         .frame(width: 65, alignment: .trailing)
@@ -118,7 +119,7 @@ public struct FileRowView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(node.isCalculating)
-                    .help(viewModel.l10n.recalculateThisFolder)
+                    .help(l10n.recalculateThisFolder)
                     .frame(width: 24, height: 24)
                     .opacity(isHovered || node.isCalculating ? 1.0 : 0.4)
                 } else {
@@ -151,7 +152,7 @@ public struct FileRowView: View {
                     Button {
                         viewModel.calculateFolderSize(node: node, forceRecalculate: true)
                     } label: {
-                        Label(viewModel.l10n.recalculateSize, systemImage: "arrow.clockwise")
+                        Label(l10n.recalculateSize, systemImage: "arrow.clockwise")
                     }
 
                     Divider()
@@ -160,13 +161,13 @@ public struct FileRowView: View {
                 Button {
                     viewModel.revealInFinder(node: node)
                 } label: {
-                    Label(viewModel.l10n.showInFinder, systemImage: "folder")
+                    Label(l10n.showInFinder, systemImage: "folder")
                 }
 
                 Button {
                     viewModel.openInTerminal(node: node)
                 } label: {
-                    Label(viewModel.l10n.openInTerminal, systemImage: "terminal")
+                    Label(l10n.openInTerminal, systemImage: "terminal")
                 }
 
                 Divider()
@@ -175,7 +176,7 @@ public struct FileRowView: View {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(node.url.path, forType: .string)
                 } label: {
-                    Label(viewModel.l10n.copyPath, systemImage: "doc.on.doc")
+                    Label(l10n.copyPath, systemImage: "doc.on.doc")
                 }
             }
 
